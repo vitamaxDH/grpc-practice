@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package prime;
+
+option java_package = "com.proto.prime";
+option java_multiple_files = true;
+
+message PrimeNumberRequest {
+  int32 number = 1;
+}
+
+message PrimeNumberResponse {
+  int32 result = 1;
+}
+
+service PrimeNumberService {
+  rpc Calculate(PrimeNumberRequest) returns (stream PrimeNumberResponse) {};
+}

@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package calculate;
+
+option java_package = "com.proto.calculate";
+option java_multiple_files = true;
+
+message Summing {
+  int32 first = 1;
+  int32 second = 2;
+}
+
+message SumRequest {
+  Summing sum = 1;
+}
+
+message SumResponse {
+  int32 result = 1;
+}
+
+message AverageRequest {
+  int32 number = 1;
+}
+
+message AverageResponse {
+  double result = 1;
+}
+
+message SquareRootRequest {
+  int32 number = 1;
+}
+
+message SquareRootResponse {
+  double number_root= 1;
+}
+
+service CalculateService {
+  rpc Sum(SumRequest) returns (SumResponse) {};
+
+  rpc Average(stream AverageRequest) returns (AverageResponse) {};
+
+  // error handling
+  // this RPC will throw an exception if the sent number is negative
+  rpc SquareRoot(SquareRootRequest) returns (SquareRootResponse) {};
+}
+
