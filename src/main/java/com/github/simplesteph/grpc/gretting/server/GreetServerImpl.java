@@ -2,7 +2,9 @@ package com.github.simplesteph.grpc.gretting.server;
 
 import com.proto.greet.GreetEveryoneRequest;
 import com.proto.greet.GreetEveryoneResponse;
+import com.proto.greet.GreetWithDeadlineRequest;
 import com.proto.greet.LongGreetRequest;
+import io.grpc.Context;
 import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.TimeUnit;
@@ -26,14 +28,14 @@ public class GreetServerImpl extends com.proto.greet.GreetServiceGrpc.GreetServi
 
         // complete the RPC call
         responseObserver.onCompleted();
-     }
+    }
 
     @Override
     public void greetManyTimes(com.proto.greet.GreetManyTimesRequest request, StreamObserver<com.proto.greet.GreetManyTimesResponse> responseObserver) {
         String firstName = request.getGreeting().getFirstName();
 
         try {
-            for (int i = 0; i < 10; i++){
+            for (int i = 0; i < 10; i++) {
                 String result = "Hello " + firstName + ", response number: " + i;
                 com.proto.greet.GreetManyTimesResponse response = com.proto.greet.GreetManyTimesResponse.newBuilder()
                         .setResult(result)
@@ -43,7 +45,7 @@ public class GreetServerImpl extends com.proto.greet.GreetServiceGrpc.GreetServi
 
                 TimeUnit.SECONDS.sleep(1);
             }
-        } catch (InterruptedException e){
+        } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
             responseObserver.onCompleted();
@@ -105,5 +107,33 @@ public class GreetServerImpl extends com.proto.greet.GreetServiceGrpc.GreetServi
                 responseObserver.onCompleted();
             }
         };
+    }
+
+    @Override
+    public void greetWithDeadline(GreetWithDeadlineRequest request, StreamObserver<com.proto.greet.GreetWithDeadlineResponse> responseObserver) {
+        Context current = Context.current();
+
+        try {
+            for (int i = 0; i < 3; i++) {
+                if (!current.isCancelled()){
+                    System.out.println("sleep for 100 ms");
+                    TimeUnit.MILLISECONDS.sleep(100);
+                } else {
+                    return ;
+                }
+            }
+
+            System.out.println("send response");
+            responseObserver.onNext(
+                    com.proto.greet.GreetWithDeadlineResponse.newBuilder()
+                            .setResult("Hello " + request.getGreeting().getFirstName())
+                            .build()
+            );
+
+            responseObserver.onCompleted();
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -65,5 +65,5 @@ service GreetService {
 
   // Rpc with Deadline
   // this Rpc will complete in no less than 300ms
-  rpc GreetWithDeadline(GreetWithDeadlineRequest) returns (stream GreetWithDeadlineResponse) {};
+  rpc GreetWithDeadline(GreetWithDeadlineRequest) returns (GreetWithDeadlineResponse) {};
 }

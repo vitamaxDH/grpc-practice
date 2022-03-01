@@ -4,8 +4,7 @@ import com.proto.greet.GreetServiceGrpc;
 import com.proto.greet.Greeting;
 import com.proto.greet.LongGreetRequest;
 import com.proto.greet.LongGreetResponse;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.*;
 import io.grpc.stub.StreamObserver;
 
 import java.util.Arrays;
@@ -23,9 +22,9 @@ public class GreetingClient {
 //        doUnaryCall(channel);
 //        doServerStreawmingCall(channel);
 //        doClientStreamingCall(channel);
+//        doBiDiStreamingCall(channel);
 
-        doBiDiStreamingCall(channel);
-
+        doUnaryCallWithDeadline(channel);
         // do something
         System.out.println("Shutting down channel");
         channel.shutdown();
@@ -154,6 +153,50 @@ public class GreetingClient {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+
+    private void doUnaryCallWithDeadline(ManagedChannel channel) {
+        GreetServiceGrpc.GreetServiceBlockingStub blockingStub = GreetServiceGrpc.newBlockingStub(channel);
+
+        // first call (500 ms deadline)
+        try {
+            System.out.println("Sending a request with a deadline of 5000 ms");
+            com.proto.greet.GreetWithDeadlineResponse response = blockingStub.withDeadline(Deadline.after(5000, TimeUnit.MILLISECONDS))
+                    .greetWithDeadline(com.proto.greet.GreetWithDeadlineRequest.newBuilder()
+                            .setGreeting(Greeting.newBuilder()
+                                    .setFirstName("대한 exceeded")
+                                    .build())
+                            .build());
+            System.out.println(response.getResult());
+
+        } catch (StatusRuntimeException e) {
+            if (e.getStatus() == Status.DEADLINE_EXCEEDED) {
+                System.out.println("Deadline has been exceeded, we don't want the response");
+            } else {
+                e.printStackTrace();
+            }
+        }
+
+        // first call (500 ms deadline)
+        try {
+            System.out.println("Sending a request with a deadline of 100 ms");
+            com.proto.greet.GreetWithDeadlineResponse response = blockingStub.withDeadline(Deadline.after(100, TimeUnit.MILLISECONDS))
+                    .greetWithDeadline(com.proto.greet.GreetWithDeadlineRequest.newBuilder()
+                            .setGreeting(Greeting.newBuilder()
+                                    .setFirstName("대한 not exceeded")
+                                    .build())
+                            .build());
+            System.out.println(response.getResult());
+
+        } catch (StatusRuntimeException e) {
+            if (e.getStatus() == Status.DEADLINE_EXCEEDED) {
+                System.out.println("Deadline has been exceeded, we don't want the response");
+            } else {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     public static void main(String[] args) {
