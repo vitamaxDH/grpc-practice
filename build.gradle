@@ -9,6 +9,7 @@ version '1.0-SNAPSHOT'
 repositories {
     mavenCentral()
 }
+def grpcVersion = "1.44.1"
 
 protobuf {
     protoc {
@@ -16,7 +17,7 @@ protobuf {
     }
     plugins {
         grpc {
-            artifact = 'io.grpc:protoc-gen-grpc-java:1.44.1'
+            artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}"
         }
     }
     generateProtoTasks {
@@ -27,9 +28,10 @@ protobuf {
 }
 
 dependencies {
-    runtimeOnly 'io.grpc:grpc-netty-shaded:1.44.1' // shaded: includes ssl libraries
-    implementation 'io.grpc:grpc-protobuf:1.44.1'
-    implementation 'io.grpc:grpc-stub:1.44.1'
+    runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}" // shaded: includes ssl libraries
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+    implementation "io.grpc:grpc-services:${grpcVersion}"
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'

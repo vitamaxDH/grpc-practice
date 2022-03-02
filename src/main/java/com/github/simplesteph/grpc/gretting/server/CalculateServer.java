@@ -2,12 +2,14 @@ package com.github.simplesteph.grpc.gretting.server;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.protobuf.services.ProtoReflectionService;
 
 public class CalculateServer {
 
     public static void main(String[] args) throws Exception {
         Server server = ServerBuilder.forPort(9999)
                 .addService(new CalculateServerImpl())
+                .addService(ProtoReflectionService.newInstance()) // reflection
                 .build();
 
         server.start();
