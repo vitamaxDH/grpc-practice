@@ -7,27 +7,41 @@ import com.proto.greet.LongGreetResponse;
 import io.grpc.*;
 import io.grpc.stub.StreamObserver;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class GreetingClient {
 
-    private ManagedChannel channel;
+    public static void main(String[] args) throws IOException {
+        System.out.println("Hello I'm a gRPC client");
 
-    public void run() {
-        channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+        GreetingClient main = new GreetingClient();
+        main.run();
+    }
+
+    public void run() throws IOException {
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
                 .usePlaintext()
                 .build();
+
+        ChannelCredentials creds = TlsChannelCredentials.newBuilder()
+                .trustManager(new File("ssl/ca.crt"))
+                .build();
+        ManagedChannel secureChannel = Grpc.newChannelBuilder("localhost:50051", creds)
+                .build();
+
 //        doUnaryCall(channel);
-//        doServerStreawmingCall(channel);
+//        doServerStreamingCall(channel);
 //        doClientStreamingCall(channel);
 //        doBiDiStreamingCall(channel);
-
-        doUnaryCallWithDeadline(channel);
+//        doUnaryCallWithDeadline(channel);
+        doUnaryCall(secureChannel);
         // do something
         System.out.println("Shutting down channel");
-        channel.shutdown();
+        secureChannel.shutdown();
     }
 
     private void doUnaryCall(ManagedChannel channel) {
@@ -199,11 +213,5 @@ public class GreetingClient {
 
     }
 
-    public static void main(String[] args) {
-        System.out.println("Hello I'm a gRPC client");
-
-        GreetingClient main = new GreetingClient();
-        main.run();
-    }
 
 }
