@@ -1,4 +1,4 @@
-package com.github.simplesteph.grpc.gretting.client;
+package com.github.simplesteph.grpc.greeting.client;
 
 import com.proto.greet.GreetServiceGrpc;
 import com.proto.greet.Greeting;

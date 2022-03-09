@@ -1,4 +1,4 @@
-package com.github.simplesteph.grpc.gretting.client;
+package com.github.simplesteph.grpc.greeting.client;
 
 import com.proto.calculate.AverageRequest;
 import com.proto.calculate.AverageResponse;

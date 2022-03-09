@@ -1,4 +1,4 @@
-package com.github.simplesteph.grpc.gretting.server;
+package com.github.simplesteph.grpc.greeting.server;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
