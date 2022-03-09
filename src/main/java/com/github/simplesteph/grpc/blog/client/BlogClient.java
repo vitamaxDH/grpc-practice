@@ -4,8 +4,6 @@ import com.proto.blog.Blog;
 import com.proto.blog.BlogServiceGrpc;
 import com.proto.blog.CreateBlogRequest;
 import com.proto.blog.CreateBlogResponse;
-import com.proto.blog.ReadBlogRequest;
-import com.proto.blog.ReadBlogResponse;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
@@ -42,7 +40,7 @@ public class BlogClient {
 
         System.out.println("Reading blog....");
 
-        ReadBlogResponse readBlogResponse = blogClient.readBlog(com.proto.blog.ReadBlogRequest.newBuilder()
+        com.proto.blog.ReadBlogResponse readBlogResponse = blogClient.readBlog(com.proto.blog.ReadBlogRequest.newBuilder()
                 .setBlogId(blogId)
                 .build());
 
@@ -55,8 +53,21 @@ public class BlogClient {
 //                .setBlogId("6228aa4ba09ab969873eeab1")
 //                .build());
 
+        Blog newBlog = Blog.newBuilder()
+                .setId(blogId)
+                .setAuthorId("Changed Author")
+                .setTitle("New blog (updated!")
+                .setContent("Hello world this is my first blog! I've added some more content")
+                .build();
 
+        System.out.println("Updating blog");
+        com.proto.blog.UpdateBlogResponse updateBlogResponse = blogClient.updateBlog(com.proto.blog.UpdateBlogRequest.newBuilder()
+                .setBlog(newBlog)
+                .build());
 
+        System.out.println("Updated blog");
+        System.out.println(updateBlogResponse.getBlog());
     }
 
 }
+
