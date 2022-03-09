@@ -7,15 +7,17 @@ import com.proto.blog.CreateBlogResponse;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
+import java.util.concurrent.TimeUnit;
+
 public class BlogClient {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         BlogClient calculateClient = new BlogClient();
 
         calculateClient.run();
     }
 
-    void run() {
+    void run() throws Exception {
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
                 .usePlaintext()
                 .build();
@@ -67,6 +69,22 @@ public class BlogClient {
 
         System.out.println("Updated blog");
         System.out.println(updateBlogResponse.getBlog());
+
+        System.out.println("Deleting blog");
+        com.proto.blog.DeleteBlogResponse deleteBlogResponse = blogClient.deleteBlog(com.proto.blog.DeleteBlogRequest.newBuilder()
+                .setBlogId(blogId)
+                .build());
+
+        System.out.println("Deleted blog");
+        System.out.println(deleteBlogResponse.getBlogId());
+
+
+        System.out.println("Reading blog");
+        // this one should return NOT_FOUND
+        com.proto.blog.ReadBlogResponse readBlogResponseAfterDeletion = blogClient.readBlog(com.proto.blog.ReadBlogRequest.newBuilder()
+                .setBlogId(blogId)
+                .build());
+
     }
 
 }

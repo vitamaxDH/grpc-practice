@@ -4,11 +4,8 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
-import com.proto.blog.Blog;
-import com.proto.blog.BlogServiceGrpc;
-import com.proto.blog.CreateBlogRequest;
-import com.proto.blog.CreateBlogResponse;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import org.bson.Document;
@@ -16,18 +13,18 @@ import org.bson.types.ObjectId;
 
 import static com.mongodb.client.model.Filters.eq;
 
-public class BlogServiceImpl extends BlogServiceGrpc.BlogServiceImplBase {
+public class BlogServiceImpl extends com.proto.blog.BlogServiceGrpc.BlogServiceImplBase {
 
     private MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
     private MongoDatabase database = mongoClient.getDatabase("mydb");
     private MongoCollection<Document> collection = database.getCollection("blog");
 
     @Override
-    public void createBlog(CreateBlogRequest request, StreamObserver<CreateBlogResponse> responseObserver) {
+    public void createBlog(com.proto.blog.CreateBlogRequest request, StreamObserver<com.proto.blog.CreateBlogResponse> responseObserver) {
 
         System.out.println("Received Create Blog request");
 
-        Blog blog = request.getBlog();
+        com.proto.blog.Blog blog = request.getBlog();
 
         Document doc = new Document("author_id", blog.getAuthorId())
                 .append("title", blog.getTitle())
@@ -41,7 +38,7 @@ public class BlogServiceImpl extends BlogServiceGrpc.BlogServiceImplBase {
         String id = doc.getObjectId("_id").toString();
         System.out.println("Inserted Blog: " + id);
 
-        CreateBlogResponse response = CreateBlogResponse.newBuilder()
+        com.proto.blog.CreateBlogResponse response = com.proto.blog.CreateBlogResponse.newBuilder()
                 .setBlog(blog.toBuilder().setId(id))
                 .build();
 
@@ -77,7 +74,7 @@ public class BlogServiceImpl extends BlogServiceGrpc.BlogServiceImplBase {
             );
         } else {
             System.out.println("Blog found, sending response");
-            Blog blog = documentToBlog(result);
+            com.proto.blog.Blog blog = documentToBlog(result);
 
             responseObserver.onNext(com.proto.blog.ReadBlogResponse.newBuilder()
                     .setBlog(blog)
@@ -87,8 +84,8 @@ public class BlogServiceImpl extends BlogServiceGrpc.BlogServiceImplBase {
         }
     }
 
-    private Blog documentToBlog(Document document) {
-        return Blog.newBuilder()
+    private com.proto.blog.Blog documentToBlog(Document document) {
+        return com.proto.blog.Blog.newBuilder()
                 .setId(document.getObjectId("_id").toString())
                 .setAuthorId(document.getString("author_id"))
                 .setTitle(document.getString("title"))
@@ -100,7 +97,7 @@ public class BlogServiceImpl extends BlogServiceGrpc.BlogServiceImplBase {
     public void updateBlog(com.proto.blog.UpdateBlogRequest request, StreamObserver<com.proto.blog.UpdateBlogResponse> responseObserver) {
         System.out.println("Received Update Blog request");
 
-        Blog blog = request.getBlog();
+        com.proto.blog.Blog blog = request.getBlog();
         String blogId = blog.getId();
 
         System.out.println("Searching for a blog so we can update it");
@@ -147,4 +144,38 @@ public class BlogServiceImpl extends BlogServiceGrpc.BlogServiceImplBase {
         }
     }
 
+
+    @Override
+    public void deleteBlog(com.proto.blog.DeleteBlogRequest request, StreamObserver<com.proto.blog.DeleteBlogResponse> responseObserver) {
+        System.out.println("Received Delete Blog Request");
+        String blogId = request.getBlogId();
+
+        DeleteResult result = null;
+        try {
+            result = collection.deleteOne(eq("_id", new ObjectId(blogId)));
+        } catch (Exception e) {
+            System.out.println("Blog not found");
+            responseObserver.onError(
+                    Status.NOT_FOUND
+                            .withDescription("The blog with the corresponding id was not found")
+                            .augmentDescription(e.getLocalizedMessage())
+                            .asRuntimeException()
+            );
+        }
+        if (result.getDeletedCount() == 0) {
+            System.out.println("Blog not found");
+            responseObserver.onError(
+                    Status.NOT_FOUND
+                            .withDescription("The blog with the corresponding id was not found")
+                            .asRuntimeException()
+            );
+        } else {
+            System.out.println("Blog was deleted");
+            responseObserver.onNext(com.proto.blog.DeleteBlogResponse.newBuilder()
+                    .setBlogId(blogId)
+                    .build());
+
+            responseObserver.onCompleted();
+        }
+    }
 }
