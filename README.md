@@ -186,4 +186,15 @@ Shutting down channel
 Process finished with exit code 0
 ```
 
+### Useful links
 
+The gRPC project is changing really fast.
+
+Here are some links that will be useful for your to keep up with times:
+
+Join the gRPC community here: https://grpc.io/community/ <br>
+Find extra awesome resources at this link: https://github.com/grpc-ecosystem/awesome-grpc <br><br>
+If you're looking for additional Java projects and code: <br>
+Great collection of projects: https://github.com/saturnism/grpc-java-by-example <br>
+Additional plugins: https://github.com/salesforce/grpc-java-contrib <br>
+Read the documentation https://grpc.io/docs/guides/

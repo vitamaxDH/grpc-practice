@@ -79,12 +79,16 @@ public class BlogClient {
         System.out.println(deleteBlogResponse.getBlogId());
 
 
-        System.out.println("Reading blog");
-        // this one should return NOT_FOUND
-        com.proto.blog.ReadBlogResponse readBlogResponseAfterDeletion = blogClient.readBlog(com.proto.blog.ReadBlogRequest.newBuilder()
-                .setBlogId(blogId)
-                .build());
+//        System.out.println("Reading blog");
+//        // this one should return NOT_FOUND
+//        com.proto.blog.ReadBlogResponse readBlogResponseAfterDeletion = blogClient.readBlog(com.proto.blog.ReadBlogRequest.newBuilder()
+//                .setBlogId(blogId)
+//                .build());
 
+        System.out.println("\n\n\n\n\n\n\n\n\n=====================================================================\n");
+
+        blogClient.listBlog(com.proto.blog.ListBlogRequest.newBuilder().build())
+                .forEachRemaining(listBlogResponse -> System.out.println(listBlogResponse.getBlog()));
     }
 
 }

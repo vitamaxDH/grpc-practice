@@ -6,6 +6,8 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import com.proto.blog.ListBlogRequest;
+import com.proto.blog.ListBlogResponse;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import org.bson.Document;
@@ -177,5 +179,21 @@ public class BlogServiceImpl extends com.proto.blog.BlogServiceGrpc.BlogServiceI
 
             responseObserver.onCompleted();
         }
+    }
+
+    @Override
+    public void listBlog(ListBlogRequest request, StreamObserver<ListBlogResponse> responseObserver) {
+        System.out.println("Received List Blog Request");
+
+        collection.find().iterator().forEachRemaining(document -> {
+            responseObserver.onNext(
+                    ListBlogResponse.newBuilder()
+                            .setBlog(documentToBlog(document))
+                            .build()
+            );
+
+        });
+
+        responseObserver.onCompleted();
     }
 }
